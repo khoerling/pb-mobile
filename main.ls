@@ -7,7 +7,6 @@ global.moment = require \moment
 require! {
   express
   \pretty-error
-  auth: \http-auth
   connect: 'express/node_modules/connect'
   \./app/server/mw
   \./app/server/api-v1

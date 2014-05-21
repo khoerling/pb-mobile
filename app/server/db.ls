@@ -1,6 +1,6 @@
 require! {
   Bookshelf: \bookshelf
-  Promise: \bookshelf/node_modules/bluebird
+  Promise: \bluebird
   shared: \../shared/helpers
   \pretty-error
   \change-case

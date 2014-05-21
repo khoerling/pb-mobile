@@ -152,7 +152,8 @@ app.resource = (Model, middlewares=[]) ->
     | \post     => app.post    "/#{db.util.route-name Model::table-name}",     [urlencoded, json, ...middlewares, fn]
     | otherwise => app[method] "/#{db.util.route-name Model::table-name}/:id", [urlencoded, json, ...middlewares, fn]
 
-for Model in db.__tables |> values |> map (-> db[it])
+for Model in db.__tables |> values |> map (-> db[db.util.class-name it])
+  console.log Model
   if not Model::table-name.match /2/
     app.resource Model
 

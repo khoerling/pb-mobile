@@ -8,7 +8,7 @@ global.ReactRouter = require \react-router-component
 global.ReactAsync = require \react-async
 global <<< db
 global <<< require \prelude-ls
-global.Promise = require \bookshelf/node_modules/bluebird
+global.Promise = require \bluebird
 global.moment = require \moment
 global.routes = require '../shared/routes'
 
