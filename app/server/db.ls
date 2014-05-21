@@ -152,6 +152,7 @@ for let t in __tables
   Tag
   TagsMessages
   TagsPosts
+  User
   UsersConversations
 } = module.exports
 

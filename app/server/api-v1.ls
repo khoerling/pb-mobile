@@ -25,7 +25,7 @@ get-one-fn = (Model) ->
     m  = new Model {id}
 
     # reset relations at every request & add any extras
-    rel = keys db.__relations[Model::table-name]
+    rel = keys db.__relations[db.util.class-name Model::table-name]
     if extra = req.param \relations
       if typeof! extra is \Array
         rel = rel ++ extra
@@ -36,7 +36,8 @@ get-one-fn = (Model) ->
         res.json m.to-JSON!
       else
         res.json 404, {}
-    ).catch(->
+    ).catch((err) ->
+      console.warn err.stack
       res.json 404, {errors:["#{Model::table-name} #id not found"]}
     )
 
@@ -55,7 +56,7 @@ get-one-fn = (Model) ->
 #   select `Server`.* from `Server` order by `name` DESC, `id` asc, `monthly_cost` DESC limit 2 offset 0
 get-many-fn = (Model) ->
   var collection
-  relations = keys db.__relations[Model::table-name]
+  relations = keys db.__relations[db.util.class-name Model::table-name]
   (req, res, next) ->
     collection := Model.collection! # start with a fresh collection object every request
     collection.query((query) ->
