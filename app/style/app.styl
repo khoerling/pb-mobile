@@ -1,0 +1,93 @@
+@import 'nib'
+
+global-reset();
+
+// ## Variables
+theme_color = #428bca
+text_color  = #fff
+
+blue_color   = rgb(31, 169, 231)
+green_color  = rgb(126, 187, 48)
+orange_color = rgb(230, 129, 35)
+
+
+// ## App
+body
+  font-family 'Helvetica Neue', 'Helvetica', sans-serif
+  &.loaded
+    header, footer
+      opacity 1
+      transition opacity .8s ease-out
+
+  .blue
+    background-color blue_color
+  .green
+    background-color green_color
+  .orange
+    background-color orange_color
+
+  a
+    text-decoration none
+
+header
+  position fixed
+  top 15px
+  right 27px
+  z-index 10
+  opacity 0
+  a
+    display inline-block
+    margin 0 14px
+    color #888
+    font-size .9em
+    transition all .12s ease-out
+    &:hover
+      color #666
+      transform scale(1.04)
+      transition none
+
+h1
+  text-indent -9999px
+h3
+  position fixed
+  bottom 10px
+  right 35px
+  color #dadada
+  font-size 1.5em
+  z-index 10
+
+.splatter
+  margin-left -40px
+  margin-top -40px
+
+.title
+  margin-left 4px
+  margin-top 1px
+.title, .shadow
+  padding 8px
+  border-radius 30px / 35px
+.pattern
+  &.geeks, &.software
+    border-right 4px solid #fff
+
+footer
+  position fixed
+  opacity 0
+  bottom 13px
+  left 0
+  right 0
+  text-align center
+  z-index 99
+  a
+    font-size .85em
+    color #ccc
+    display inline-block
+    transition all .5s ease-out .1s
+    &:hover
+      transform scale(1.07)
+      transition all .01s ease-in
+      color #aaa
+      b
+        color #999
+    b
+      color #aaa
