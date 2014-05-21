@@ -101,12 +101,16 @@ thread-data.for-each (e,i) ~>
   s = new Surface {
     content: e.title
     size: [void, 100]
+    classes: [\thread]
     properties:
+      text-transform: \capitalize
       margin: \auto
       line-height: \100px
-      background-color: "hsl(#{i*360/40}, 100%, 50%)"
       text-align: \center
   }
+  s.on \click, ->
+    console.log \click
+
   s.pipe thread-list
   threads.push s
 

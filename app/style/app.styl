@@ -3,12 +3,17 @@
 global-reset();
 
 // ## Variables
-theme_color = #428bca
-text_color  = #fff
+// PowerBulletin cyan/blue theme default
+theme_color  = #4ccfea
+colored_text = #fff
+sprite_hue   = 0deg
 
-blue_color   = rgb(31, 169, 231)
-green_color  = rgb(126, 187, 48)
-orange_color = rgb(230, 129, 35)
+// tint color is placed over the background among other images (translucent)
+tint_color = rgba(240,240,240,0.65)
+
+theme_alpha      = rgba(theme_color, .15)
+dark_theme_color = darken(theme_color, 40%)
+dark_text        = darken(theme_color, 60%)
 
 
 // ## App
@@ -18,13 +23,6 @@ body
     header, footer
       opacity 1
       transition opacity .8s ease-out
-
-  .blue
-    background-color blue_color
-  .green
-    background-color green_color
-  .orange
-    background-color orange_color
 
   a
     text-decoration none
@@ -56,19 +54,17 @@ h3
   font-size 1.5em
   z-index 10
 
-.splatter
-  margin-left -40px
-  margin-top -40px
-
-.title
-  margin-left 4px
-  margin-top 1px
-.title, .shadow
-  padding 8px
-  border-radius 30px / 35px
-.pattern
-  &.geeks, &.software
-    border-right 4px solid #fff
+.thread
+  background-color theme_alpha
+  border-bottom 1px solid darken(theme_alpha, 10%)
+  transition background-color .3s ease-out
+  color #333
+  &:hover
+    color #000
+    background-color darken(theme_alpha, 20%)
+    border-bottom 1px solid darken(theme_alpha, 30%)
+    cursor pointer
+    transition background-color 0
 
 footer
   position fixed
