@@ -17,6 +17,7 @@ require! {
 pe = new pretty-error!
 
 app = express!
+app.get \/probe (req, res) -> res.send 200, \OK
 app.use connect.logger(immediate: false, format: logs.dev-format)
 app.use express.static "#__dirname/public"
 app.use \/api/v1, api-v1

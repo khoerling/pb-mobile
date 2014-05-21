@@ -18,11 +18,9 @@ app.get \/favicon.ico, (req, res) -> res.send 404
 app.get r(\Homepage),
   mw.common-locals,
   ((req, res, next) ->
-    res.locals.title = 'Forward ideas.  Simple tools.  Groundbreaking software. '
+    res.locals.title = 'Power Bulletin &#9674; Forum Community in Real-Time!'
     res.locals.count = 1
     next!),
   mw.react-or-json
-
-app.get \/probe (req, res) -> res.send 200, \OK
 
 # vim:fdm=indent
