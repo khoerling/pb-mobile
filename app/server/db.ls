@@ -145,22 +145,90 @@ for let t in __tables
 
 # setup entity relations
 export __relations =
-  Alias:{}
-  Auth:{}
-  Conversation:{}
+  Alias:
+    user: ->
+      @belongs-to User, \user_id
+    site: ->
+      @belongs-to Site, \site_id
+
+  Auth:
+    user: ->
+      @belongs-to User, \user_id
+
+  Conversation:
+    site: ->
+      @belongs-to Site, \site_id
+    messages: ->
+      @has-many Message, \conversation_id
+
   Doc:{}
-  Domain:{}
-  Follow:{}
-  Forum:{}
-  Image:{}
-  Message:{}
-  MessagesRead:{}
-  Moderation:{}
-  Page:{}
-  Post:{}
-  Product:{}
-  Purchase:{}
-  Site:{}
+
+  Domain:
+    site: ->
+      @belongs-to Site, \site_id
+
+  Follow:
+    site: ->
+      @belongs-to Site, \site_id
+    user: ->
+      @belongs-to User, \user_id
+
+  Forum:
+    site: ->
+      @belongs-to Site, \site_id
+    posts: ->
+      @has-many Post, \forum_id
+
+  Image:
+    post: ->
+      @belongs-to Post, \post_id
+    thread: ->
+      @belongs-to Post, \thread_id
+
+  Message:
+    user: ->
+      @belongs-to User, \user_id
+    conversation: ->
+      @belongs-to Conversation, \conversation_id
+
+  MessagesRead:
+    message: ->
+      @belongs-to Messagee, \message_id
+    user: ->
+      @belongs-to User, \user_id
+
+  Moderation:
+    user: ->
+      @belongs-to User, \user_id
+    post: ->
+      @belongs-to Post, \post_id
+
+  Page:
+    site: ->
+      @belongs-to Site, \site_id
+
+  Post:
+    thread: ->
+      @belongs-to Post, \thread_id
+    parent: ->
+      @belongs-to Post, \parent_id
+    user: ->
+      @belongs-to User, \user_id
+    forum: ->
+      @belongs-to Forum, \forum_id
+
+  Product: {}
+
+  Purchase:
+    user: ->
+      @belongs-to User, \user_id
+
+  Site:
+    user: ->
+      @belongs-to User, \user_id
+    domains: ->
+      @has-many Domain, \site_id
+
   Subscription:{}
   Tag:{}
   TagsMessages:{}
