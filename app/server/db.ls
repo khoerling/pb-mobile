@@ -77,7 +77,7 @@ export util =
     "#{change-case.camel-case tt}s"
 
   route-name: (t) ->
-    util.collection-name t |> change-case.param-case
+    t
 
 # make Bookshelf Models for every table
 for let t in __tables
