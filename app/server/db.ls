@@ -79,6 +79,18 @@ export util =
   route-name: (t) ->
     t
 
+  json-fields: (fields) ->
+    {
+      parse: (attrs) ->
+        for f in fields
+          attrs[f] = JSON.parse attrs[f] if attrs[f]
+        attrs
+      format: (attrs) ->
+        for f in fields
+          attrs[f] = JSON.stringify attrs[f] if attrs[f]
+        attrs
+    }
+
 # make Bookshelf Models for every table
 for let t in __tables
   proto = {
@@ -299,14 +311,26 @@ export __relations =
 
 # Keeping the extra methods separate from the relations makes introspection easier.
 export __methods =
-  Site:
-    parse: (attrs) ->
-      attrs.config = if attrs.config then JSON.parse attrs.config else {}
-      attrs
-    format: (attrs) ->
-      if attrs.config
-        attrs.config = JSON.stringify attrs.config
-      attrs
+  Alias: {
+  } <<< util.json-fields <[rights config]>
+
+  Auth: {
+  } <<< util.json-fields <[profile]>
+
+  Domain: {
+  } <<< util.json-fields <[config]>
+
+  Site: {
+  } <<< util.json-fields <[config]>
+
+  Page: {
+  } <<< util.json-fields <[config]>
+
+  Purchase: {
+  } <<< util.json-fields <[config]>
+
+  Product: {
+  } <<< util.json-fields <[config]>
 
   Promo:
 
