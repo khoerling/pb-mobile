@@ -31,10 +31,14 @@ get-one-fn = (Model) ->
         rel = rel ++ extra
       else
         rel.push extra
-    m.fetch with-related: rel .then ((r) ->
-      if r then res.json m.to-JSON!)
-      .catch ->
-        res.json 404, {errors:["#{Model::table-name} #id not found"]}
+    m.fetch with-related: rel .then((r) ->
+      if r
+        res.json m.to-JSON!
+      else
+        res.json 404, {}
+    ).catch(->
+      res.json 404, {errors:["#{Model::table-name} #id not found"]}
+    )
 
 # URL Query Parameters
 #
