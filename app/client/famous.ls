@@ -10,6 +10,7 @@ require! {
   \./famous/physics/forces/VectorField
   \./famous/math/Vector
   \./famous/surfaces/ImageSurface
+  \./famous/surfaces/ContainerSurface
   \./famous/transitions/Easing
   \./famous/transitions/Transitionable
   \./famous/transitions/SpringTransition
@@ -80,7 +81,7 @@ icon
     icon.particle.apply-force (new Vector(0, 0, -0.6))
 # attach physics to icon
 PE.add-body icon.particle
-layout = new HeaderFooterLayout header-size: 360px, footer-size: 100px
+layout = new HeaderFooterLayout header-size: 150px, footer-size: 100px
 scene.id.thread.add layout
 layout.header.add icon.state .add icon.particle .add icon
 <~ icon.state.set-transform Transform.translate(0, 210px, 1700), { method: \spring, period: 500ms, dampening-ratio: 1 }
@@ -99,14 +100,19 @@ thread-list = new Scrollview!
 thread-data.for-each (e,i) ~>
   s = new Surface {
     content: e.title
-    size: [void, 200]
+    size: [void, 100]
     properties:
+      margin: \auto
+      line-height: \100px
       background-color: "hsl(#{i*360/40}, 100%, 50%)"
       text-align: \center
   }
   s.pipe thread-list
   threads.push s
-layout.content.add thread-list
+
+clip = new ContainerSurface properties: { overflow: \hidden }
+  ..add thread-list
+layout.content.add clip
 
 #layout.header
 #layout.content.add (new StateModifier { origin: [0.5, 0.85] }) .add grid
