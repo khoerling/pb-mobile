@@ -190,6 +190,8 @@ export __relations =
       @belongs-to User, \user_id
     conversation: ->
       @belongs-to Conversation, \conversation_id
+    messages-read: ->
+      @has-many MessagesRead, \message_id
 
   MessagesRead:
     message: ->
@@ -212,10 +214,18 @@ export __relations =
       @belongs-to Post, \thread_id
     parent: ->
       @belongs-to Post, \parent_id
+    thread-posts: ->
+      @has-many Post, \thread_id
+    child-posts: ->
+      @has-many Post, \parent_id
     user: ->
       @belongs-to User, \user_id
     forum: ->
       @belongs-to Forum, \forum_id
+    images: ->
+      @has-many Image, \post_id
+    thread-images: ->
+      @has-many Image, \thread_id
 
   Product: {}
 
@@ -228,11 +238,41 @@ export __relations =
       @belongs-to User, \user_id
     domains: ->
       @has-many Domain, \site_id
+    aliases: ->
+      @has-many Alias, \site_id
+    conversation: ->
+      @has-many Conversation, \site_id
+    follows: ->
+      @has-many Follow, \site_id
+    forums: ->
+      @has-many Forum, \site_id
+    pages: ->
+      @has-many Page, \site_id
 
   Subscription:{}
   Tag:{}
   TagsMessages:{}
   TagsPosts:{}
+  User:
+    aliases: ->
+      @has-many Alias, \user_id
+    auths: ->
+      @has-many Auth, \user_id
+    follows: ->
+      @has-many Follow, \user_id
+    messages: ->
+      @has-many Message, \user_id
+    conversations: ->
+      @has-many Conversation, \user_id
+    messages-read: ->
+      @has-many MessagesRead, \user_id
+    moderations: ->
+      @has-many Moderation, \user_id
+    posts: ->
+      @has-many Post, \user_id
+    purchases: ->
+      @has-many Purchase, \user_id
+
   UsersConversations:{}
 
   Client:
