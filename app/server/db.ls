@@ -11,29 +11,57 @@ require! {
 pe = new pretty-error!
 
 export __tables = <[
-  Client
-  ClientAccount
-  Promo
-  Promo2InterestTag
+  aliases
+  auths
+  conversations
+  docs
+  domains
+  follows
+  forums
+  images
+  messages
+  messages_read
+  moderations
+  pages
+  posts
+  products
+  purchases
+  sites
+  subscriptions
+  tags
+  tags_messages
+  tags_posts
+  thread_subscriptions
+  users
+  users_conversations
 ]>
 
 # initialize bookshelf models and collections
 export Bookshelf = Bookshelf
 
 # connection to mysql
-export MySQL = Bookshelf.initialize(
-  client     : \mysql
+export Postgres = Bookshelf.initialize(
+  client     : \postgresql
   debug      : process.env.DB_DEBUG    or false
   connection :
     host     : process.env.DB_HOST     or \127.0.0.1
-    user     : process.env.DB_USER     or \root
-    password : process.env.DB_PASSWORD or \vagrant
-    database : process.env.DB_NAME     or \PromoManager
+    user     : process.env.DB_USER     or \postgres
+    password : process.env.DB_PASSWORD or void
+    database : process.env.DB_NAME     or \pb
 )
-MySQL.plugin \virtuals
+Postgres.plugin \virtuals
 
 # utility functions
 export util =
+  class-name: (t) ->
+    switch t
+    | \aliases             => \Alias
+    | \messages_read       => \MessagesRead
+    | \tags_messages       => \TagsMessages
+    | \tags_posts          => \TagsPosts
+    | \users_conversations => \UsersConversations
+    | otherwise            => change-case.pascal-case(t).replace(/s$/, '')
+
   model-name: (t) ->
     tt = if t.match /IP/
       t.replace /IP/, 'Ip'
@@ -69,7 +97,7 @@ for let t in __tables
     #
     # return {Promise}    resolves to true if it destroyed everything successfully
     destroy-recursively: ->
-      relations = keys __relations[@table-name]
+      relations = keys __relations[util.class-name @table-name]
       |> map (~> { name: it, relation: this[it]! })
       |> group-by (~> it.relation.related-data.type)
       child-relations = if relations?has-many
@@ -88,18 +116,57 @@ for let t in __tables
       )
   }
   proto.rm-rf = proto.destroy-recursively
-  module.exports[t] = MySQL.Model.extend proto
+  module.exports[util.class-name t] = Postgres.Model.extend proto
 
 # assign existing tables to local vars
 {
-  Client
-  ClientAccount
-  Promo
-  Promo2InterestTag
+  Alias
+  Auth
+  Conversation
+  Doc
+  Domain
+  Follow
+  Forum
+  Image
+  Message
+  MessagesRead
+  Moderation
+  Page
+  Post
+  Product
+  Purchase
+  Site
+  Subscription
+  Tag
+  TagsMessages
+  TagsPosts
+  UsersConversations
 } = module.exports
 
 # setup entity relations
 export __relations =
+  Alias:{}
+  Auth:{}
+  Conversation:{}
+  Doc:{}
+  Domain:{}
+  Follow:{}
+  Forum:{}
+  Image:{}
+  Message:{}
+  MessagesRead:{}
+  Moderation:{}
+  Page:{}
+  Post:{}
+  Product:{}
+  Purchase:{}
+  Site:{}
+  Subscription:{}
+  Tag:{}
+  TagsMessages:{}
+  TagsPosts:{}
+  UsersConversations:{}
+
   Client:
     promos: ->
       @has-many Promo, \Client_id
@@ -124,6 +191,15 @@ export __relations =
 
 # Keeping the extra methods separate from the relations makes introspection easier.
 export __methods =
+  Site:
+    parse: (attrs) ->
+      attrs.config = if attrs.config then JSON.parse attrs.config else {}
+      attrs
+    format: (attrs) ->
+      if attrs.config
+        attrs.config = JSON.stringify attrs.config
+      attrs
+
   Promo:
 
     validate-async: ->
@@ -154,9 +230,9 @@ export __static =
     fn: -> void
 
 for t in __tables
-  module.exports[t].prototype <<< __relations[t]
-  module.exports[t].prototype <<< __methods[t]   if __methods[t]
-  module.exports[t]           <<< __static[t]    if __static[t]
-  module.exports[util.model-name t] = new module.exports[t]
+  c = util.class-name t
+  module.exports[c].prototype <<< __relations[c]
+  module.exports[c].prototype <<< __methods[c]   if __methods[c]
+  module.exports[c]           <<< __static[c]    if __static[c]
 
 # vim:fdm=indent
