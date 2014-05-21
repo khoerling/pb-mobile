@@ -321,6 +321,16 @@ export __methods =
   Domain: {
   } <<< util.json-fields <[config]>
 
+  Forum: {
+    threads: (opts) ->
+      Post.collection!query((q) ~>
+        q
+          .where \forum_id, \=, @id
+          .and-where \parent_id, \is, null
+          .order-by \created, \desc
+      ).fetch(with-related: <[user]>)
+  } <<< util.json-fields <[config]>
+
   Site: {
   } <<< util.json-fields <[config]>
 

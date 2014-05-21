@@ -162,6 +162,12 @@ for Model in db.__tables |> values |> map (-> db[db.util.class-name it])
     app.resource Model
 
 ## Custom Routes
+app.get '/forums/:id/threads', (req, res, next) ->
+  id = req.param \id
+  forum = new db.Forum {id}
+  forum.threads!then((threads) ->
+    res.json threads.toJSON!
+  )
 
 ## Helper FNs
 
