@@ -3,10 +3,9 @@ require! {
   \./famous/core/Scene
   \./famous/core/Context
   \./famous/core/Transform
+  \./famous/core/Surface
   \./famous/physics/PhysicsEngine
   \./famous/physics/bodies/Particle
-  \./famous/physics/bodies/Circle
-  \./famous/physics/constraints/Wall
   \./famous/physics/forces/Spring
   \./famous/physics/forces/VectorField
   \./famous/math/Vector
@@ -18,9 +17,8 @@ require! {
   \./famous/transitions/SnapTransition
   \./famous/views/GridLayout
   \./famous/views/HeaderFooterLayout
+  \./famous/views/Scrollview
   \./famous/modifiers/StateModifier
-
-  \./BoxSection
 }
 
 # famo.us entry point
@@ -35,34 +33,18 @@ main-context = Engine.create-context!
 # image assets {{{
 icon = new ImageSurface {
   properties: {cursor: \pointer}
-  content: \/images/dimension_icon.png
-  size:    [100px, 115px]
-}
-dimension = new ImageSurface {
-  content: \/images/dimension_logo_text.png
-  size:    [337px, 41px]
-}
-top-left-splatter = new ImageSurface {
-  content: \/images/top_left_corner_splatter.png
-  size:    [207px, 169px]
-  classes: [\splatter]
-}
-tagline = new ImageSurface {
-  content: \/images/tagline.png
-  size:    [649px, 24px]
-}
-keith-off = new ImageSurface {
-  content: \/images/keith0.png
-  size:    [154px, 154px]
-}
-keith-on = new ImageSurface {
-  content: \/images/keith1.png
-  size:    [154px, 154px]
+  content: \/images/pb_icon_logo.png
+  size:    [81px, 89px]
 }
 #}}}
 
 spring = { method: \spring, period: 260ms, damping-ratio: 0.5 }
 sharp  = { method: \wall, period: 200ms }
+
+# fetch thread data
+dfd = $.Deferred!
+$.get \/api/v1/forums/2/threads, (data) -> dfd.resolve data
+pfd = dfd.promise!
 
 # root scene
 scene = new Scene {
@@ -70,12 +52,12 @@ scene = new Scene {
   opacity: 1
   target:  [
     { # intro page
-      target: {id: \intro}
+      target: {id: \thread}
       origin: [0, 0]
     },
     { # geek page
       opacity: 0
-      target: {id: \geeks}
+      target: {id: \forum}
       transform: [
         {rotate-z: Math.PI/4}, # radians
         #{scale:    [0.5, 0.5, 1]}
@@ -97,49 +79,45 @@ icon
   ..on \click ->
     icon.particle.apply-force (new Vector(0, 0, -0.6))
 # attach physics to icon
-#Wall.ON_CONTACT.REFLECT = 1
-#wall = new Wall normal: [1,0,0], distance: 0
-#PE.attach wall, [icon.particle]
 PE.add-body icon.particle
 layout = new HeaderFooterLayout header-size: 360px, footer-size: 100px
-scene.id.intro.add layout
+scene.id.thread.add layout
 layout.header.add icon.state .add icon.particle .add icon
 <~ icon.state.set-transform Transform.translate(0, 210px, 1700), { method: \spring, period: 500ms, dampening-ratio: 1 }
+thread-data <~ $.when pfd .then
 
-# yield, then-- snap everything else in place
-top-left-splatter.state = new StateModifier origin: [0, 0]
-  ..set-transform Transform.scale(3, 1.8)
-  ..set-transform Transform.scale(1, 1), duration: 150ms
-dimension.state = new StateModifier { origin: [0.5, 0], opacity: 0 }
-  ..set-opacity 1, duration: 400ms
-  ..set-transform Transform.translate(70px, 120px, 0), spring
-tagline.state = new StateModifier { origin: [0.5, 0], opacity: 0 }
-
+# yield, then-- snap thread list in place
 PE.attach icon.spring, icon.particle
-icon.state.set-transform Transform.translate(-175px, 80px, 0), sharp
-tagline.state
-  ..set-transform Transform.translate(0, 230px, 0), sharp
-  ..set-opacity 1, duration: 350ms
+icon.state
+  ..set-transform Transform.translate(0, -100px, 0), sharp
+  ..set-opacity 0, duration: 180ms
 
-layout.header
-  ..add top-left-splatter.state .add top-left-splatter
-  ..add dimension.state .add dimension
-  ..add tagline.state .add tagline
-grid = new GridLayout dimensions: [3, 1]
-  ..sequence-from [
-    new BoxSection \geeks, classes: [\blue]
-    new BoxSection \software, size: [281px, 114px], classes: [\green]
-    new BoxSection \talk, size: [213px, 165px], classes: [\orange]
-  ]
-layout.content.add (new StateModifier { origin: [0.5, 0.85] }) .add grid
+threads = []
+thread-list = new Scrollview!
+  ..sequence-from threads
+
+thread-data.for-each (e,i) ~>
+  s = new Surface {
+    content: e.title
+    size: [void, 200]
+    properties:
+      background-color: "hsl(#{i*360/40}, 100%, 50%)"
+      text-align: \center
+  }
+  s.pipe thread-list
+  threads.push s
+layout.content.add thread-list
+
+#layout.header
+#layout.content.add (new StateModifier { origin: [0.5, 0.85] }) .add grid
 
 <~ set-timeout _, 800ms
 $ \body .add-class \loaded
 
 
 
-# TODO geek page
+# TODO forum page
 # ---------
-scene.id.geeks.add keith-on
+#scene.id.forum.add keith-on
 
 # vim:fdm=marker
