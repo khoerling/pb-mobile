@@ -23,5 +23,6 @@ app.get r(\Homepage),
     next!),
   mw.react-or-json
 
+app.get \/probe (req, res) -> res.send 200, \OK
 
 # vim:fdm=indent
