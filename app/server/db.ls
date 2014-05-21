@@ -337,6 +337,14 @@ export __methods =
   Page: {
   } <<< util.json-fields <[config]>
 
+  Post:
+    flattened: (opts) ->
+      Post.collection!query((q) ~>
+        q
+          .where(\thread_id, \=, @id)
+          .order-by(\id)
+      ).fetch(with-related: <[user]>)
+
   Purchase: {
   } <<< util.json-fields <[config]>
 

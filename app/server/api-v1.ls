@@ -169,6 +169,15 @@ app.get '/forums/:id/threads', (req, res, next) ->
     res.json threads.toJSON!
   )
 
+app.get '/posts/:id/flattened', (req, res, next) ->
+  id = req.param \id
+  post = new db.Post {id}
+  post.flattened!then((posts) ->
+    res.json posts.toJSON!
+  ).catch((err) ->
+    res.json 401, { err }
+  )
+
 ## Helper FNs
 
 # vim:fdm=indent
