@@ -2,8 +2,9 @@ require! {
   \./famous/core/Engine
   \./famous/core/Scene
   \./famous/core/Context
-  \./famous/core/Transform
   \./famous/core/Surface
+  \./famous/core/Transform
+  \./famous/core/View
   \./famous/physics/PhysicsEngine
   \./famous/physics/bodies/Particle
   \./famous/physics/forces/Spring
@@ -18,6 +19,7 @@ require! {
   \./famous/transitions/SnapTransition
   \./famous/views/GridLayout
   \./famous/views/HeaderFooterLayout
+  \./famous/views/Lightbox
   \./famous/views/Scrollview
   \./famous/modifiers/StateModifier
 }
@@ -38,6 +40,10 @@ icon = new ImageSurface {
   size:    [81px, 89px]
 }
 #}}}
+
+class AppView extends View
+  ->
+    super arguments
 
 spring = { method: \spring, period: 260ms, damping-ratio: 0.5 }
 sharp  = { method: \wall, period: 200ms }
@@ -69,7 +75,6 @@ scene = new Scene {
 }
 main-context.add scene
 
-
 # initial page
 # ---------
 # build-in intro scene w/ icon
@@ -86,6 +91,10 @@ scene.id.thread.add layout
 layout.header.add icon.state .add icon.particle .add icon
 <~ icon.state.set-transform Transform.translate(0, 210px, 1700), { method: \spring, period: 500ms, dampening-ratio: 1 }
 thread-data <~ $.when pfd .then
+
+lightbox = new Lightbox
+window.lightbox = lightbox
+window.thread-list = thread-list
 
 # yield, then-- snap thread list in place
 PE.attach icon.spring, icon.particle
@@ -108,8 +117,33 @@ thread-data.for-each (e,i) ~>
       line-height: \100px
       text-align: \center
   }
-  s.on \click, ->
-    console.log \click
+
+  id = e.id
+
+  ### click handler for thread {{{
+  s.on \click, (ev) ->
+    thread-container = new ContainerSurface size: [500, 500], properties: { background-color: \#f00, overflow: \hidden }
+    posts = []
+    post-list = new Scrollview(size: [500, 500])
+      ..sequence-from posts
+
+    post-list.on \click, -> lightbox.hide!
+
+    $.get "/api/v1/posts/#{id}/flattened", (r) ->
+      r.for-each (e, i) ->
+        post-surface = new Surface {
+          content: e.html
+          size: [300, 300]
+          origin: [0.5, 0.5]
+          properties:
+            background-color: \#ccc
+            margin: \auto
+            z-index: 5
+        }
+        post-surface.pipe post-list
+        posts.push post-surface
+      lightbox.show(thread-container)
+  ### }}}
 
   s.pipe thread-list
   threads.push s
@@ -117,6 +151,7 @@ thread-data.for-each (e,i) ~>
 clip = new ContainerSurface properties: { overflow: \hidden }
   ..add thread-list
 layout.content.add clip
+layout.content.add lightbox
 
 #layout.header
 #layout.content.add (new StateModifier { origin: [0.5, 0.85] }) .add grid
